@@ -27,7 +27,8 @@ import tensorflow as tf
 
 def _read_words(filename):
   with tf.gfile.GFile(filename, "r") as f:
-    return f.read().decode("utf-8").replace("\n", "<eos>").split()
+    #return f.read().decode("utf-8").replace("\n", "<eos>").split()
+    return f.read().replace("\n", "<eos>").split()
 
 
 def _build_vocab(filename):
@@ -75,7 +76,7 @@ def ptb_raw_data(data_path=None):
   valid_data = _file_to_word_ids(valid_path, word_to_id)
   test_data = _file_to_word_ids(test_path, word_to_id)
   vocabulary = len(word_to_id)
-  return train_data, valid_data, test_data, vocabulary
+  return train_data, valid_data, test_data, word_to_id
 
 
 def ptb_producer(raw_data, batch_size, num_steps, name=None):
@@ -98,10 +99,14 @@ def ptb_producer(raw_data, batch_size, num_steps, name=None):
     tf.errors.InvalidArgumentError: if batch_size or num_steps are too high.
   """
   with tf.name_scope(name, "PTBProducer", [raw_data, batch_size, num_steps]):
+
     raw_data = tf.convert_to_tensor(raw_data, name="raw_data", dtype=tf.int32)
 
     data_len = tf.size(raw_data)
+
     batch_len = data_len // batch_size
+
+    print(data_len,batch_len)
     data = tf.reshape(raw_data[0 : batch_size * batch_len],
                       [batch_size, batch_len])
 
@@ -119,4 +124,5 @@ def ptb_producer(raw_data, batch_size, num_steps, name=None):
     y = tf.strided_slice(data, [0, i * num_steps + 1],
                          [batch_size, (i + 1) * num_steps + 1])
     y.set_shape([batch_size, num_steps])
+
     return x, y
