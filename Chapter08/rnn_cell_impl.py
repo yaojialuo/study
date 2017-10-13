@@ -27,7 +27,7 @@ from __future__ import print_function
 import collections
 import hashlib
 import numbers
-
+import numpy as np
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
@@ -45,7 +45,7 @@ from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops import variables as tf_variables
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.util import nest
-
+import tensorflow as tf
 
 _BIAS_VARIABLE_NAME = "bias"
 _WEIGHTS_VARIABLE_NAME = "kernel"
@@ -1036,7 +1036,7 @@ def _linear(args,
     weights = vs.get_variable(
         _WEIGHTS_VARIABLE_NAME, [total_arg_size, output_size],
         dtype=dtype,
-        initializer=kernel_initializer)
+        initializer=init_ops.constant_initializer([[0.95,0.45,0.7,0.6],[0.8,0.25,0.45,0.4],[0.8,0.15,0.1,0.25]], dtype=dtype))#kernel_initializer,tf.ones_initializer()
     if len(args) == 1:
       res = math_ops.matmul(args[0], weights)
     else:
@@ -1050,5 +1050,5 @@ def _linear(args,
       biases = vs.get_variable(
           _BIAS_VARIABLE_NAME, [output_size],
           dtype=dtype,
-          initializer=bias_initializer)
+          initializer=init_ops.constant_initializer([0.65,0.2,0,0.1], dtype=dtype))#bias_initializer
     return nn_ops.bias_add(res, biases)
