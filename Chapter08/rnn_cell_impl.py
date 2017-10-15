@@ -1032,7 +1032,8 @@ def _linear(args,
 
   # Now the computation.
   scope = vs.get_variable_scope()
-  with vs.variable_scope(scope) as outer_scope:
+  #with vs.variable_scope(scope) as outer_scope:
+  with vs.variable_scope("bar") as outer_scope:
     weights = vs.get_variable(
         _WEIGHTS_VARIABLE_NAME, [total_arg_size, output_size],
         dtype=dtype,
