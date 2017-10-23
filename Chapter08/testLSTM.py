@@ -8,8 +8,8 @@ num_hidden=1
 #https://medium.com/@aidangomez/let-s-do-this-f9b699de31d9 
 #input=tf.Variable(np.array([1,1,1,1,1]).reshape(5,1))
 #input=tf.Variable([[1,1,1,1,1]],dtype=tf.float32)
-input=tf.Variable([[1,2]],dtype=tf.float32)
-input2=tf.Variable([[0.5,3]],dtype=tf.float32)
+input=tf.Variable([[1,2]],dtype=tf.float32,trainable=False)
+input2=tf.Variable([[0.5,3]],dtype=tf.float32,trainable=False)
 print(input)
 
 _BIAS_VARIABLE_NAME = "bias"
@@ -26,10 +26,24 @@ with tf.Session() as sess:
     (_, state) = cell(input, initial_state)
     #tf.get_variable_scope().reuse_variables()
     (cell_out, state) = cell(input2, state)
+
+    #bp now
+    #[cell_out, state]
+    #[array([[ 0.77198118]], dtype=float32), LSTMStateTuple(c=array([[ 1.5176332]], dtype=float32), h=array([[ 0.77198118]], dtype=float32))]
+    out_put2 = tf.Variable(1.25,dtype=tf.float32,trainable=False)
+    x_squared = tf.square(cell_out[0][0] -out_put2)
+    mse = x_squared / 2
+    optimizer = tf.train.GradientDescentOptimizer(0.1)
+    train = optimizer.minimize(mse)
+
+
     init_op = tf.global_variables_initializer()
     print("name:"+tf.get_variable_scope().name)
     sess.run(init_op)
     #sess = tf_debug.LocalCLIDebugWrapperSession(sess=sess)
-    writer = tf.summary.FileWriter("E:/Program Files/Anaconda3/envs/tensorflow/Scripts/tensorlog", sess.graph)
-    writer.close()
+    #writer = tf.summary.FileWriter("E:/Program Files/Anaconda3/envs/tensorflow/Scripts/tensorlog", sess.graph)
+    #writer.close()
     print(sess.run([cell_out, state]))
+    print(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
+     print(sess.run(train))
+    print(sess.run(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)))
