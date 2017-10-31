@@ -23,15 +23,16 @@ with tf.Session() as sess:
     #LSTMStateTuple(c=array([[ 0.,  0.,  0.,  0.,  0.]], dtype=float32), h=array([[ 0.,  0.,  0.,  0.,  0.]], dtype=float32))
     initial_state = cell.zero_state(1,input.dtype)
 
-    (_, state) = cell(input, initial_state)
+    (cell_out1, state) = cell(input, initial_state)
     #tf.get_variable_scope().reuse_variables()
     (cell_out, state) = cell(input2, state)
 
     #bp now
     #[cell_out, state]
     #[array([[ 0.77198118]], dtype=float32), LSTMStateTuple(c=array([[ 1.5176332]], dtype=float32), h=array([[ 0.77198118]], dtype=float32))]
+    out_put1 = tf.Variable(0.5,dtype=tf.float32,trainable=False)
     out_put2 = tf.Variable(1.25,dtype=tf.float32,trainable=False)
-    x_squared = tf.square(cell_out[0][0] -out_put2)
+    x_squared = tf.square(cell_out[0][0] -out_put2)+tf.square(cell_out1[0][0] - out_put1 )
     mse = x_squared / 2
     optimizer = tf.train.GradientDescentOptimizer(0.1)
     train = optimizer.minimize(mse)
@@ -45,5 +46,6 @@ with tf.Session() as sess:
     #writer.close()
     print(sess.run([cell_out, state]))
     print(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
-     print(sess.run(train))
+    print(sess.run(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)))
+    print(sess.run(train))
     print(sess.run(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)))
