@@ -8,21 +8,20 @@ num_hidden=1
 #https://medium.com/@aidangomez/let-s-do-this-f9b699de31d9 
 #input=tf.Variable(np.array([1,1,1,1,1]).reshape(5,1))
 #input=tf.Variable([[1,1,1,1,1]],dtype=tf.float32)
-# ./tensorboard.exe --logdir=tensorlog
-input=tf.Variable([[1,2]],dtype=tf.float32,trainable=False)
+#rnn_implementation
+input=tf.Variable([[1]],dtype=tf.float32,trainable=False)
 input2=tf.Variable([[0.5,3]],dtype=tf.float32,trainable=False)
 print(input)
-
 _BIAS_VARIABLE_NAME = "bias"
 _WEIGHTS_VARIABLE_NAME = "kernel"
 with tf.Session() as sess:
 
     #cell = tf.contrib.rnn.LSTMCell(num_hidden,state_is_tuple=False)
     #[[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]]
-    cell = rnn_cell_impl.BasicLSTMCell(num_hidden, state_is_tuple=True,forget_bias=0.15,reuse=False)
+    cell = rnn_cell_impl.BasicRNNCell(num_hidden)
 
     #LSTMStateTuple(c=array([[ 0.,  0.,  0.,  0.,  0.]], dtype=float32), h=array([[ 0.,  0.,  0.,  0.,  0.]], dtype=float32))
-    initial_state = cell.zero_state(1,input.dtype)
+    initial_state = cell.zero_state(1,tf.float32)
 
     (cell_out1, state) = cell(input, initial_state)
     #tf.get_variable_scope().reuse_variables()
@@ -45,6 +44,7 @@ with tf.Session() as sess:
     #sess = tf_debug.LocalCLIDebugWrapperSession(sess=sess)
     #writer = tf.summary.FileWriter("E:/Program Files/Anaconda3/envs/tensorflow/Scripts/tensorlog", sess.graph)
     #writer.close()
+    print(sess.run(initial_state))
     print(sess.run([cell_out, state]))
     print(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
     print(sess.run(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)))

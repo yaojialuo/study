@@ -1,4 +1,5 @@
 # right
+#http://blog.csdn.net/u012436149/article/details/53905797
 import tensorflow as tf
 
 x = tf.placeholder(tf.float32, shape=[None, 1], name='x')

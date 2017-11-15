@@ -255,7 +255,9 @@ class BasicRNNCell(RNNCell):
 
   def call(self, inputs, state):
     """Most basic RNN: output = new_state = act(W * input + U * state + B)."""
-    output = self._activation(_linear([inputs, state], self._num_units, True))
+    #output = self._activation(_linear([inputs, state], self._num_units, True))
+    output = _linear([inputs, state], self._num_units, True)
+    #output = math_ops.sigmoid(_linear([inputs, state], self._num_units, True))
     return output, output
 
 
@@ -1032,12 +1034,14 @@ def _linear(args,
 
   # Now the computation.
   scope = vs.get_variable_scope()
-  #with vs.variable_scope(scope) as outer_scope:
-  with vs.variable_scope("bar") as outer_scope:
+  with vs.variable_scope(scope) as outer_scope:
+  #with vs.variable_scope("bar") as outer_scope:
     weights = vs.get_variable(
         _WEIGHTS_VARIABLE_NAME, [total_arg_size, output_size],
         dtype=dtype,
-        initializer=init_ops.constant_initializer([[0.95,0.45,0.7,0.6],[0.8,0.25,0.45,0.4],[0.8,0.15,0.1,0.25]], dtype=dtype))#kernel_initializer,tf.ones_initializer()
+        #initializer=kernel_initializer)
+        initializer=init_ops.constant_initializer([[-1.5],[2]],dtype=dtype))
+        #initializer=init_ops.constant_initializer([[0.95,0.45,0.7,0.6],[0.8,0.25,0.45,0.4],[0.8,0.15,0.1,0.25]], dtype=dtype))#kernel_initializer,tf.ones_initializer()
     if len(args) == 1:
       res = math_ops.matmul(args[0], weights)
     else:
@@ -1051,5 +1055,6 @@ def _linear(args,
       biases = vs.get_variable(
           _BIAS_VARIABLE_NAME, [output_size],
           dtype=dtype,
-          initializer=init_ops.constant_initializer([0.65,0.2,0,0.1], dtype=dtype))#bias_initializer
+          trainable=False, initializer=bias_initializer)
+          #initializer=init_ops.constant_initializer([0.65,0.2,0,0.1], dtype=dtype))#bias_initializer
     return nn_ops.bias_add(res, biases)
