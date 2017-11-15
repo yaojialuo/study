@@ -12,6 +12,12 @@ num_hidden=1
 #rnn_implementation
 input=tf.Variable([[1]],dtype=tf.float32,trainable=False)
 step=2
+inputdata=tf.Variable([[[1],[1]]],dtype=tf.float32,trainable=False)
+np.ones((1,2,1))
+#[batch_size, max_time, ...]
+inputdata=tf.Variable(np.ones((1,2,1)),dtype=tf.float32,trainable=False)
+#<tf.Variable 'Variable_1:0' shape=(1, 2, 1) dtype=float32_ref>
+print(inputdata)
 output=tf.Variable([[step]],dtype=tf.float32,trainable=False)
 print(input)
 _BIAS_VARIABLE_NAME = "bias"
@@ -30,18 +36,25 @@ def cond(i,mystate):
 
 def body(i,mystate):
     # LSTMStateTuple(c=array([[ 0.,  0.,  0.,  0.,  0.]], dtype=float32), h=array([[ 0.,  0.,  0.,  0.,  0.]], dtype=float32))
-    _, state = cell(input, initial_state)
-    print(state)
+
+
     #tf.add_to_collection("state", state)
     #https: // github.com / tensorflow / tensorflow / issues / 4094  # issue-173787623
     #Any op created in a branch of a TensorFlow conditional or the body of a TensorFlow loop is marked as "non-fetchable", to prevent various programming errors.
-    for r in range(step):
-        if (r > 0):
-            _, state = cell(input, state)
+
+    # _, state = cell(input, initial_state)
+    # for r in range(step):
+    #     if (r > 0):
+    #         _, state = cell(input, state)
+
+
+    _, state = tf.nn.dynamic_rnn(cell, inputdata,initial_state=initial_state, dtype=tf.float32)
+
     # tf.get_variable_scope().reuse_variables()
     train = tf.train.GradientDescentOptimizer(1).minimize(tf.square(state - output))
     with tf.control_dependencies([train]):
         #tf.assign(mystate,state)
+        print(i)
         return i + 1,state
 
 
